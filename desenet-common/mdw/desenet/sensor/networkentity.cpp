@@ -103,6 +103,9 @@ void NetworkEntity::onReceive(NetworkInterfaceDriver & driver, const uint8_t * c
 			// ... 4) Extract the valuable data from it!
 			_pSvGroupMask = b.svGroupMask();
 
+			// ... 5) Blink the led
+			Factory::instance().ledController().flashLed(0);
+
 		}
 		else if (frame.type() == desenet::FrameType::MPDU)
 		{
@@ -134,18 +137,17 @@ void NetworkEntity::onTimeSlotSignal(const ITimeSlotManager & timeSlotManager, c
 		{
 			if(_pSvGroupMask[i] && _pPubAppList[i] != NULL)
 			{
-				SvPDU svPdu = SvPDU();
+				SvPDU svPdu = SvPDU(i);
 				svPdu.setSize(_pPubAppList[i]->svPublishIndication(i, svPdu.buffer()));
 
-				mpdu.add(i,svPdu);
+				mpdu.add(svPdu);
 
 			}
 		}
 
-		Trace::outln("Sending %s", mpdu.toString());
+		// Send the MPDU (Request the transceiver to put the bits in the air).
 		transceiver() << mpdu;
-
-
+		//Trace::outln("Sending %s", mpdu.toString());
 	}
 
 }

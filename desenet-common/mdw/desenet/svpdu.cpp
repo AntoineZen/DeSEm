@@ -9,30 +9,32 @@
 
 namespace desenet {
 
-SvPDU::SvPDU() : _buffer(7), _size(0)
+SvPDU::SvPDU(SvGroup group) : Epdu(),_group(group)
 {
 	// TODO Auto-generated constructor stub
 
 }
 
-void SvPDU::setSize(std::size_t size)
+
+void SvPDU::setGroup(SvGroup group)
 {
-	_size = size;
+	_group = group;
 }
 
-std::size_t SvPDU::size()
+SvGroup SvPDU::group()
 {
-	return _size;
+	return _group;
 }
 
-SharedByteBuffer& SvPDU::buffer(){
-	return _buffer;
+uint8_t SvPDU::header()
+{
+	return ((_group & 0x0F) << 3) | (_size & 0x07);
 }
+
 
 SvPDU::~SvPDU() {
 	// TODO Auto-generated destructor stub
 }
-
 
 
 } /* namespace desenet */

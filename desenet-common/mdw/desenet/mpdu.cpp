@@ -23,7 +23,8 @@ Mpdu::Mpdu() : Frame(Frame::Mtu)
 	//memset(buffer() + Frame::HEADER_SIZE, 0, 1);	// Set first field in payload to zero
     setDestination(GATEWAY_ADDRESS);
 
-
+    // Set the ePDU count to zero
+	buffer()[Frame::HEADER_SIZE + E_PDU_COUNT_OFFSET] = 0;
 
     // Get our slot nuber for the NET layer
     uint8_t slot = Net::instance().slot();
@@ -48,14 +49,13 @@ Mpdu::~Mpdu() {
 } /* namespace desenet */
 
 
-void Mpdu::add(uint8_t group, SvPDU& svPdu)
+void Mpdu::add(SvPDU& svPdu)
 {
-	uint8_t svPduHeader = ((group & 0x0F) << 3) | (svPdu.size() & 0x07);
 	// Increment the ePDU count, dirrecty in the buffer
 	buffer()[Frame::HEADER_SIZE + E_PDU_COUNT_OFFSET]++;
 
 	// Copy the data from the SvPDU into the MPDU buffer
-	*insert_ptr++ = svPduHeader;
+	*insert_ptr++ = svPdu.header();
 	memcpy(insert_ptr, svPdu.buffer().data(), svPdu.size());
 
 	// Increment insertion pointer to be ready for the next call!

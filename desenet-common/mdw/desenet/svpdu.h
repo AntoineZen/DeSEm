@@ -9,26 +9,29 @@
 #define DESENET_SVPDU_H_
 
 #include "mdw/containers/sharedbytebuffer.hpp"
+
+#include "epdu.h"
+
 using namespace hei;
 
 
 namespace desenet {
 
-class SvPDU {
+class SvPDU: public Epdu {
 public:
-	SvPDU();
+	SvPDU(SvGroup group);
 	virtual ~SvPDU();
 
-	void setSize(std::size_t size);
+	void setGroup(SvGroup group);
 
-	std::size_t size();
+	SvGroup group();
 
-	SharedByteBuffer& buffer();
+
+	uint8_t header();
+
 
 private:
-
-	SharedByteBuffer _buffer;
-	std::size_t _size;
+	SvGroup _group;
 };
 
 } /* namespace desenet */
