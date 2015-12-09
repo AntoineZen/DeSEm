@@ -107,7 +107,7 @@ void NetworkEntity::onReceive(NetworkInterfaceDriver & driver, const uint8_t * c
 		else if (frame.type() == desenet::FrameType::MPDU)
 		{
 			Trace::outln("Frame is a MPDU");
-			// We don't care !
+			Trace::outln(frame.toString());
 		}
 		else
 		{
@@ -120,28 +120,30 @@ void NetworkEntity::onReceive(NetworkInterfaceDriver & driver, const uint8_t * c
 
 void NetworkEntity::onTimeSlotSignal(const ITimeSlotManager & timeSlotManager, const ITimeSlotManager::SIG & signal)
 {
-	uint8_t dummy_data[] = {0x01, 0x02, 0x03};
+	//uint8_t dummy_data[] = {0x01, 0x02, 0x03};
 	//Trace::outln("Time Slot event");
 	if (signal == ITimeSlotManager::OWN_SLOT_START)
 	{
 		//Trace::outln("Sending");
-		Frame dummy = Frame::copyFromBuffer(dummy_data, 3);
-		//Net::instance().send(dummy);
-		transceiver() << dummy;
+		//Frame dummy = Frame::copyFromBuffer(dummy_data, 3);
+		//transceiver() << dummy;
 
 		Mpdu mpdu = Mpdu();
 
-		for(unsigned int i=0; i < _pPubAppList.size(); i++)
+		for(uint8_t i=0; i < _pPubAppList.size(); i++)
 		{
 			if(_pSvGroupMask[i] && _pPubAppList[i] != NULL)
 			{
 				SvPDU svPdu = SvPDU();
 				svPdu.setSize(_pPubAppList[i]->svPublishIndication(i, svPdu.buffer()));
 
-				mpdu.add(svPdu);
+				mpdu.add(i,svPdu);
 
 			}
 		}
+
+		Trace::outln("Sending %s", mpdu.toString());
+		transceiver() << mpdu;
 
 
 	}

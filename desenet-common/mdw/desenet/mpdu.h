@@ -21,7 +21,7 @@ public:
 	Mpdu();
 	virtual ~Mpdu();
 
-	void add(SvPDU& svPdu);
+	void add(uint8_t group, SvPDU& svPdu);
 
 private:
 	uint8_t* insert_ptr;
