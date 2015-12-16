@@ -7,3 +7,5 @@
 *.map
 *.launch
 *.project
+desenet-test-bench
+mesh-simulator
