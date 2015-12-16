@@ -6,6 +6,7 @@
 #include "desenet/sensor/net.h"
 #include "interfaces/imonochromedisplay.h"
 #include "app/accelerometerapplication.h"
+#include "app/joystickapplication.h"
 #include "board/accel/accelerometer.h"
 
 class MeshSimBoard;
@@ -27,6 +28,7 @@ public:
 	MeshSimBoard & meshSimBoard() const;
 
 	app::AccelerometerApplication & accelerometerApplication() const;
+	app::JoystickApplication& joystickApplication() const;
 	board::Accelerometer & accelerometer() const;
 
 	Net & net() const;

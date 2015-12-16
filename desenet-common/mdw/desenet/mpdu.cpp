@@ -18,6 +18,8 @@
 
 namespace desenet {
 
+const uint8_t Mpdu::MAX_EPDU_COUNT = 255;
+
 Mpdu::Mpdu() : Frame(Frame::Mtu)
 {
 	//memset(buffer() + Frame::HEADER_SIZE, 0, 1);	// Set first field in payload to zero
@@ -49,8 +51,13 @@ Mpdu::~Mpdu() {
 } /* namespace desenet */
 
 
-void Mpdu::add(SvPDU& svPdu)
+bool Mpdu::add(Epdu& svPdu)
 {
+	// Check that we have enough place
+	if (svPdu.size() + length() + 1 > Mtu)
+	{
+		return false;
+	}
 	// Increment the ePDU count, dirrecty in the buffer
 	buffer()[Frame::HEADER_SIZE + E_PDU_COUNT_OFFSET]++;
 
@@ -62,5 +69,11 @@ void Mpdu::add(SvPDU& svPdu)
 	insert_ptr += svPdu.size();
 
 	setLength(length() + svPdu.size() + 1);
+	return true;
+}
+
+uint8_t Mpdu::ePduCount()
+{
+	return buffer()[Frame::HEADER_SIZE + E_PDU_COUNT_OFFSET];
 }
 

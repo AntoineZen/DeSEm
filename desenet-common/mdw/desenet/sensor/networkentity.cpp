@@ -12,6 +12,8 @@
 #include "board/ledcontroller.h"
 #include "networkentity.h"
 #include "mpdu.h"
+#include "svpdu.h"
+#include "evpdu.h"
 
 
 using std::array;
@@ -69,6 +71,11 @@ bool NetworkEntity::svPublishRequest(AbstractApplication* app,  SvGroup group)
 	return false;
 }
 
+void NetworkEntity::evPublishRequest(EvId id, const SharedByteBuffer & evData)
+{
+	_pEventElementList.push_back(EventElement(id, evData));
+}
+
 /**
  * Called by the NetworkInterfaceDriver (layer below) after reception of a new frame
  */
@@ -123,27 +130,56 @@ void NetworkEntity::onReceive(NetworkInterfaceDriver & driver, const uint8_t * c
 
 void NetworkEntity::onTimeSlotSignal(const ITimeSlotManager & timeSlotManager, const ITimeSlotManager::SIG & signal)
 {
-	//uint8_t dummy_data[] = {0x01, 0x02, 0x03};
 	//Trace::outln("Time Slot event");
 	if (signal == ITimeSlotManager::OWN_SLOT_START)
 	{
 		//Trace::outln("Sending");
-		//Frame dummy = Frame::copyFromBuffer(dummy_data, 3);
-		//transceiver() << dummy;
 
+		// Create a mPDU frame
 		Mpdu mpdu = Mpdu();
 
+		// Browse the list of the application that have registered for sample value publications
 		for(uint8_t i=0; i < _pPubAppList.size(); i++)
 		{
+			// If the Sv Group is enabled in beacon
 			if(_pSvGroupMask[i] && _pPubAppList[i] != NULL)
 			{
+				// Create a SvPDU object.
 				SvPDU svPdu = SvPDU(i);
+				// Request the application to fill it,
 				svPdu.setSize(_pPubAppList[i]->svPublishIndication(i, svPdu.buffer()));
-
+				// Add the SvPdu to the mPdu.
 				mpdu.add(svPdu);
 
 			}
 		}
+
+		// Place as much event that an mPDU can take from the event queue.
+		// As long we have enent in the queue and that we have room in the mPdu
+		while( _pEventElementList.size() && mpdu.ePduCount() < Mpdu::MAX_EPDU_COUNT)
+		{
+			// Create a Ev ePDU object
+			EvPDU evPdu = EvPDU();
+
+			// take the data from the enet at the front of queue
+			evPdu.buffer() = _pEventElementList.front().data;
+			evPdu.setId(_pEventElementList.front().id);
+
+			// Add the Ev ePDU to the mPDU.
+			if (mpdu.add(evPdu))
+			{
+				// if the Event can be added to the mPDU, we can remove it from the queue
+				_pEventElementList.pop_front();
+			}
+			else
+			{
+				// if there was enough place left in the mPDU, stop adding Ev PDU to it, so break the loop
+				break;
+				// As the event was not removed from the queue, it will be sent on the next time slot.
+			}
+
+		}
+
 
 		// Send the MPDU (Request the transceiver to put the bits in the air).
 		transceiver() << mpdu;

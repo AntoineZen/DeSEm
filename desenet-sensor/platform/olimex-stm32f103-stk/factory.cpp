@@ -35,6 +35,8 @@ void Factory::buildApplication()
 	accelerometerApplication().initialize();
 	net().initialize(__SLOT_NUMBER);
 	display().initialize();
+	Joystick::instance().initialize();
+	joystickApplication().initialize();
 
 	//
 	// Initialize relations
@@ -66,6 +68,13 @@ board::Accelerometer & Factory::accelerometer() const
 	static board::Accelerometer accelerometer;
 
 	return accelerometer;
+}
+
+app::JoystickApplication& Factory::joystickApplication() const
+{
+	static app::JoystickApplication joyApp;
+
+	return joyApp;
 }
 
 Net & Factory::net() const

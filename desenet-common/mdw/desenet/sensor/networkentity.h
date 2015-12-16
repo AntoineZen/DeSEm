@@ -40,6 +40,8 @@ public:
 
 	bool svPublishRequest(AbstractApplication* app, SvGroup group);
 
+	void evPublishRequest(EvId id, const SharedByteBuffer & evData);
+
 protected:
 	/**
 	 * @brief Holds event information.

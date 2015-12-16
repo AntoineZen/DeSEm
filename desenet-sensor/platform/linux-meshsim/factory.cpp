@@ -51,6 +51,7 @@ void Factory::buildApplication()
 	ledController().initialize();
 	accelerometer().initialize();
 	accelerometerApplication().initialize();
+	joystickApplication().initialize();
 	net().initialize(__SLOT_NUMBER);
 	display().initialize();
 
@@ -84,6 +85,13 @@ app::AccelerometerApplication & Factory::accelerometerApplication() const
 	static app::AccelerometerApplication accelerometerApp;
 
 	return accelerometerApp;
+}
+
+app::JoystickApplication& Factory::joystickApplication() const
+{
+	static app::JoystickApplication joyApp;
+
+	return joyApp;
 }
 
 board::Accelerometer & Factory::accelerometer() const

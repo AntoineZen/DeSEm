@@ -15,7 +15,6 @@ namespace desenet {
 class EvPDU: public Epdu {
 public:
 	EvPDU();
-	virtual ~EvPDU();
 
 	void setId(uint8_t id);
 

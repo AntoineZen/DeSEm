@@ -9,7 +9,7 @@
 #define DESENET_MPDU_H_
 
 #include <frame.h>
-#include "svpdu.h"
+#include "epdu.h"
 #include "mdw/containers/sharedbytebuffer.hpp"
 
 namespace desenet {
@@ -17,11 +17,15 @@ namespace desenet {
 class Mpdu: public Frame {
 
 public:
+
+	static const uint8_t MAX_EPDU_COUNT;
 public:
 	Mpdu();
 	virtual ~Mpdu();
 
-	void add(SvPDU& svPdu);
+	bool add(Epdu& svPdu);
+
+	uint8_t ePduCount();
 
 private:
 	uint8_t* insert_ptr;

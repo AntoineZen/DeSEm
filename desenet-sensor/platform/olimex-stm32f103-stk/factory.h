@@ -6,7 +6,9 @@
 #include "desenet/sensor/net.h"
 #include "interfaces/imonochromedisplay.h"
 #include "app/accelerometerapplication.h"
+#include "app/joystickapplication.h"
 #include "board/accel/accelerometer.h"
+#include "board/joystick.h"
 
 class SimpleDisplay;
 class LedController;
@@ -25,6 +27,8 @@ public:
 
 	app::AccelerometerApplication & accelerometerApplication() const;
 	board::Accelerometer & accelerometer() const;
+
+	app::JoystickApplication& joystickApplication() const;
 
 	Net & net() const;
 	SimpleDisplay & display();

@@ -10,15 +10,9 @@
 namespace desenet {
 
 
-EvPDU::EvPDU() {
-	// TODO Auto-generated constructor stub
-
+EvPDU::EvPDU(): Epdu() {
+	setSize(1);
 }
-
-EvPDU::~EvPDU() {
-	// TODO Auto-generated destructor stub
-}
-
 
 void EvPDU::setId(uint8_t id)
 {
